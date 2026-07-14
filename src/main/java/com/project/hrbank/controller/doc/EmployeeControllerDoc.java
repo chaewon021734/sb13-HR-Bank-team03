@@ -15,16 +15,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface EmployeeControllerDoc {
 
-
     @Operation(summary = "직원 생성")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200",description = "직원 생성 성공"),
-            @ApiResponse(responseCode = "400",description = "직원 정보 오류"),
-            @ApiResponse(responseCode = "404",description = "부서 없음")
+            @ApiResponse(responseCode = "200", description = "직원 생성 성공"),
+            @ApiResponse(responseCode = "400", description = "직원 정보 오류"),
+            @ApiResponse(responseCode = "404", description = "부서 없음")
     })
     @GetMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<EmployeeDto> create(
-            @Parameter(content = @Content(mediaType = "application/json")) @RequestPart(name = "employee") EmployeeCreateRequest request,
+            @Parameter(content = @Content(mediaType = "application/json"))
+            @RequestPart(name = "employee") EmployeeCreateRequest request,
             @RequestPart(name = "profile") MultipartFile file
     );
 }
