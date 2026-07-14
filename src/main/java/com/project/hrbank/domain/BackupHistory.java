@@ -37,7 +37,10 @@ public class BackupHistory extends Base {
             Instant endTime,
             BackupStatus backupStatus) {
         super();
-
+        this.ip = worker;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.backupStatus = backupStatus;
     }
 
 }
