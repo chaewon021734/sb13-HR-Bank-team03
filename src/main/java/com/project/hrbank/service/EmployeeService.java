@@ -2,6 +2,7 @@ package com.project.hrbank.service;
 
 import com.project.hrbank.domain.EmployeeStatus;
 import com.project.hrbank.dto.request.EmployeeCreateRequest;
+import com.project.hrbank.dto.request.EmployeeUpdateRequest;
 import com.project.hrbank.dto.response.EmployeeDto;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,4 +15,6 @@ public interface EmployeeService {
     EmployeeDto create(EmployeeCreateRequest request, MultipartFile file);
 
     void deleteEmployee(Long id, String remoteIp);
+
+    EmployeeDto update(Long id, EmployeeUpdateRequest request, MultipartFile file, String remoteIp);
 }
