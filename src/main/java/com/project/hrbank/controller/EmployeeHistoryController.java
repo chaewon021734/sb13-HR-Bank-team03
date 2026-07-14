@@ -20,6 +20,7 @@ public class EmployeeHistoryController implements EmployeeHistoryControllerDoc {
 
     private final EmployeeHistoryService employeeHistoryService;
 
+
     @GetMapping
     public ResponseEntity<CursorPageResponseChangeLogDto> findByParam(
             @RequestParam(required = false) String employeeNumber,

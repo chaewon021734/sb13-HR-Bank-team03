@@ -3,6 +3,8 @@ package com.project.hrbank.service.basic;
 
 import com.project.hrbank.domain.*;
 import com.project.hrbank.dto.request.EmployeeCreateRequest;
+import com.project.hrbank.dto.request.EmployeeSearchRequest;
+import com.project.hrbank.dto.response.CursorPageResponse;
 import com.project.hrbank.dto.request.EmployeeUpdateRequest;
 import com.project.hrbank.dto.response.EmployeeDto;
 import com.project.hrbank.exception.BaseException;
@@ -16,7 +18,10 @@ import com.project.hrbank.repository.EmployeeHistoryRepository;
 import com.project.hrbank.repository.EmployeeRepository;
 import com.project.hrbank.repository.FileMetaRepository;
 import com.project.hrbank.service.EmployeeService;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,8 +47,8 @@ public class BasicEmployeeService implements EmployeeService {
     public long countEmployees(EmployeeStatus status, LocalDate fromDate, LocalDate toDate) {
         Instant from = fromDate != null ? fromDate.atStartOfDay(ZoneOffset.UTC).toInstant() : null;
         Instant to = toDate != null
-                ? toDate.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant()
-                : (from != null ? Instant.now() : null);
+            ? toDate.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant()
+            : (from != null ? Instant.now() : null);
 
         return employeeRepository.countByStatusAndHireDateRange(status, from, to);
     }
@@ -67,19 +72,91 @@ public class BasicEmployeeService implements EmployeeService {
         String memo = request.memo();
 
         Employee emp = employeeRepository.save(Employee.create(
-                name,
-                department,
-                employeeNumber,
-                email,
-                position,
-                hireDate,
-                status,
-                fileMeta
+            name,
+            department,
+            employeeNumber,
+            email,
+            position,
+            hireDate,
+            status,
+            fileMeta
         ));
 
         // 히스토리 추가
 
         return mapper.toDto(emp);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CursorPageResponse<EmployeeDto> getEmployeesWithCursor(
+        EmployeeSearchRequest request
+    ) {
+
+        List<Employee> employees =
+            employeeRepository.searchByCursor(request);
+
+
+        boolean hasNext =
+            employees.size() > request.size();
+
+
+        if (hasNext) {
+            employees.remove(request.size().intValue());
+        }
+
+
+        List<EmployeeDto> content =
+            employees.stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
+
+
+        String nextCursor = null;
+        Long nextIdAfter = null;
+
+
+        if (!content.isEmpty()) {
+
+            EmployeeDto last =
+                content.get(content.size() - 1);
+
+            Employee lastEmployee =
+                employees.get(employees.size() - 1);
+
+
+            if ("name".equalsIgnoreCase(request.sortField())) {
+
+                nextCursor = last.name();
+
+            } else if ("employeeNumber"
+                .equalsIgnoreCase(request.sortField())) {
+
+                nextCursor = last.employeeNumber();
+
+            } else {
+
+                nextCursor = lastEmployee.getHireDate().toString();
+
+            }
+
+
+            nextIdAfter = last.id();
+        }
+
+
+        long totalElements =
+            employeeRepository.countEmployees();
+
+
+        return new CursorPageResponse<>(
+            content,
+            nextCursor,
+            nextIdAfter,
+            request.size(),
+            totalElements,
+            hasNext
+        );
     }
 
     @Override
@@ -89,27 +166,27 @@ public class BasicEmployeeService implements EmployeeService {
         FileMeta profileImage = employee.getProfileImaged();
 
         employee.update(
-                employee.getName(),
-                employee.getDepartment(),
-                employee.getEmail(),
-                employee.getPosition(),
-                employee.getHireDate(),
-                EmployeeStatus.RESIGNED,
-                null,
-                Instant.now()
+            employee.getName(),
+            employee.getDepartment(),
+            employee.getEmail(),
+            employee.getPosition(),
+            employee.getHireDate(),
+            EmployeeStatus.RESIGNED,
+            null,
+            Instant.now()
         );
 
         Employee emp = employeeRepository.save(employee);
 
         // EmployeeHistory 로그 추가
         employeeHistoryRepository.save(new EmployeeHistory(
-                emp,
-                emp.getDepartment(),
-                EmployeeHistoryType.EMPLOYEE_DELETED,
-                "직원 삭제",
-                null,
-                remoteIp
-                ));
+            emp,
+            emp.getDepartment(),
+            EmployeeHistoryType.EMPLOYEE_DELETED,
+            "직원 삭제",
+            null,
+            remoteIp
+        ));
 
 
         if (profileImage != null) {
@@ -180,8 +257,8 @@ public class BasicEmployeeService implements EmployeeService {
     private void checkEmail(String email){
         if (employeeRepository.existsByEmail(email)){
             throw new EmployeeDuplicateException(
-                    "email was duplicated : " + email,
-                    "이메일 중복"
+                "email was duplicated : " + email,
+                "이메일 중복"
             );
         }
     }
@@ -204,9 +281,9 @@ public class BasicEmployeeService implements EmployeeService {
     private FileMeta getFileMetaFromMultipart(MultipartFile file){
         String originalFileName = saveProfileImage(file);
         return fileMetaRepository.save(new FileMeta(
-                originalFileName,
-                file.getContentType(),
-                file.getSize()
+            originalFileName,
+            file.getContentType(),
+            file.getSize()
         ));
     }
 

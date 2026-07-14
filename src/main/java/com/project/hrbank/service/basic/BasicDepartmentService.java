@@ -47,8 +47,8 @@ public class BasicDepartmentService implements DepartmentService {
         Department dpt = departmentRepository.save(new Department(newName,newDescription,newDate));
         System.out.println(dpt.getId());
         return mapper.toDto(
-                dpt
-                ,0
+            dpt
+            ,0
         );
     }
 
@@ -72,11 +72,11 @@ public class BasicDepartmentService implements DepartmentService {
 
         return mapper.toDto(departmentRepository.save(department),0);
     }
-  
+
     @Override
     public DepartmentDto findById(Long id) {
         Department department = getEntityOrExcept(id);
-      
+
         int employeeCount = employeeRepository.countByDepartmentId(id);
 
         return mapper.toDto(department, employeeCount);
@@ -111,13 +111,13 @@ public class BasicDepartmentService implements DepartmentService {
 
         // Entity -> DTO 변환 시 실제 직원수를 조회하여 매핑
         List<DepartmentDto> content = departments.stream()
-                .map(dept -> {
-                    // DB에서 해당 부서의 실제 직원수를 조회
-                    int employeeCount = employeeRepository.countByDepartmentId(dept.getId());
+            .map(dept -> {
+                // DB에서 해당 부서의 실제 직원수를 조회
+                int employeeCount = employeeRepository.countByDepartmentId(dept.getId());
 
-                    return mapper.toDto(dept, employeeCount);
-                })
-                .collect(Collectors.toList());
+                return mapper.toDto(dept, employeeCount);
+            })
+            .collect(Collectors.toList());
 
         String nextCursor = null;
         Long nextIdAfter = null;
@@ -137,7 +137,7 @@ public class BasicDepartmentService implements DepartmentService {
         long totalElements = departmentRepository.countDepartments(request.nameOrDescription());
 
         return new CursorPageResponse<>(
-                content, nextCursor, nextIdAfter, request.size(), totalElements, hasNext
+            content, nextCursor, nextIdAfter, request.size(), totalElements, hasNext
         );
     }
 }

@@ -33,7 +33,6 @@ public class EmployeeHistory extends Base {
 
     @Column(name = "ip_address", nullable = false)
     private String ipAddress;
-
     public EmployeeHistory(
             Employee employee,
             Department department,

@@ -29,7 +29,6 @@ public class BasicEmployeeHistoryService implements EmployeeHistoryService {
             EmployeeHistorySearchRequest request
     ) {
         String field = getPagingField(request.getSortField());
-
         Slice<EmployeeHistory> result =
                 employeeHistoryRepository.findByCondition(
                         request.getEmployeeNumber(),

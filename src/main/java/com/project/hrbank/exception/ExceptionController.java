@@ -54,7 +54,7 @@ public class ExceptionController {
 
     // 500 error (default)
     @ExceptionHandler({
-            BaseException.class,
+        BaseException.class,
     })
     public ProblemDetail InternalException(BaseException e, WebRequest request) {
 
