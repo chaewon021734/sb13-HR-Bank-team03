@@ -18,7 +18,10 @@ public interface EmployeeService {
 
     void deleteEmployee(Long id, String remoteIp);
 
+    EmployeeDto findById(Long id);
+
     CursorPageResponse<EmployeeDto> getEmployeesWithCursor(EmployeeSearchRequest request);
 
     EmployeeDto update(Long id, EmployeeUpdateRequest request, MultipartFile file, String remoteIp);
+
 }

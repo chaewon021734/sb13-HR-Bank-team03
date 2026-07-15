@@ -87,6 +87,14 @@ public class BasicEmployeeService implements EmployeeService {
         return mapper.toDto(emp);
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public EmployeeDto findById(Long id) {
+        Employee employee = getEmployeeOrExcept(id);
+
+        return mapper.toDto(employee);
+    }
+
     @Override
     @Transactional(readOnly = true)
     public CursorPageResponse<EmployeeDto> getEmployeesWithCursor(
@@ -288,4 +296,5 @@ public class BasicEmployeeService implements EmployeeService {
             throw new BaseException("프로필 저장 에러");
         }
     }
+
 }
