@@ -30,7 +30,7 @@ public interface DtoMapper {
     @Mapping(target = "profileImageId", source = "profileImaged.id")
     @Mapping(
         target = "hireDate",
-        expression = "java(employee.getHireDate().atZone(java.time.ZoneOffset.UTC).format(java.time.format.DateTimeFormatter.ofPattern(\"yyyy년 M월 d일\")))"
+        expression = "java(employee.getHireDate().atZone(java.time.ZoneOffset.UTC).format(java.time.format.DateTimeFormatter.ofPattern(\"yyyy-MM-dd\")))"
     )
     EmployeeDto toDto(Employee employee);
 

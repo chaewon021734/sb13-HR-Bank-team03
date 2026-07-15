@@ -4,6 +4,7 @@ import com.project.hrbank.domain.EmployeeHistory;
 import com.project.hrbank.domain.EmployeeHistoryType;
 import com.project.hrbank.domain.QEmployee;
 
+import com.project.hrbank.domain.QEmployeeHistory;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
