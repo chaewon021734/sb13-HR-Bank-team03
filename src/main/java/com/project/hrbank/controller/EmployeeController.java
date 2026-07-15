@@ -55,7 +55,12 @@ public class EmployeeController implements EmployeeControllerDoc {
         return ResponseEntity.ok(employeeService.create(request,file));
     }
 
-
+    @GetMapping("/{id}")
+    public ResponseEntity<EmployeeDto> findById(
+            @PathVariable Long id
+    ) {
+        return ResponseEntity.ok(employeeService.findById(id));
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEmployee(
@@ -78,4 +83,5 @@ public class EmployeeController implements EmployeeControllerDoc {
         String ip = request.getRemoteAddr();
         return ResponseEntity.ok(employeeService.update(id, updateRequest, file, ip));
     }
+
 }
