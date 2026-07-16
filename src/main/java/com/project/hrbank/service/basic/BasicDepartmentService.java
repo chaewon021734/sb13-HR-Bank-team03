@@ -9,15 +9,14 @@ import com.project.hrbank.dto.response.DepartmentDto;
 import com.project.hrbank.exception.DepartmentHasEmployeesException;
 import com.project.hrbank.exception.DepartmentNameDuplicateException;
 import com.project.hrbank.exception.DepartmentNotExistException;
+import com.project.hrbank.exception.LocalDateFormatException;
 import com.project.hrbank.mapper.DtoMapper;
 import com.project.hrbank.repository.DepartmentRepository;
 import com.project.hrbank.repository.EmployeeRepository;
-import com.project.hrbank.repository.PagingRepository;
 import com.project.hrbank.service.DepartmentService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -35,13 +34,12 @@ public class BasicDepartmentService implements DepartmentService {
     private final EmployeeRepository employeeRepository;
     private final DtoMapper mapper;
 
+
+
     public DepartmentDto create(DepartmentCreateRequest request){
         String newName = request.name();
         String newDescription = request.description();
-        String newEstablishedDate = request.establishedDate();
-
-        // "YYYY-MM-DD"(ISO-8610 표준 포맷) -> Localdate
-        LocalDate newDate = LocalDate.parse(newEstablishedDate);
+        LocalDate newDate = getDateFromString(request.establishedDate());
 
         // 제약 조건 - 이름은 중복 될 수 없음
         nameCheck(newName);
@@ -54,19 +52,16 @@ public class BasicDepartmentService implements DepartmentService {
         );
     }
 
-    // Todo - employee 카운터 조회 매서드 Employee 레포지토리에 추가. dto 변환 매서드에 파라매터로 추가
-    // Todo - localdatetime 변환시 값이 없어도 에러가 나지 않도록 수정.
     public DepartmentDto update(Long id, DepartmentUpdateRequest request){
         String newName = request.name();
         String newDescription = request.description();
-        String newEstablishedDate = request.establishedDate();
-        LocalDate newDate = LocalDate.parse(newEstablishedDate);
+        LocalDate newDate = getDateFromString(request.establishedDate());
 
-        // 제약 조건 - 이름은 중복 될 수 없음
-        nameCheck(newName);
         // 제약 - id 에 해당하는 부서 없음
         Department department = getEntityOrExcept(id);
-
+        // 제약 조건 - 이름은 중복 될 수 없음(이름이 변경 된 경우)
+        if (department.getDepartmentName().equals(newName)) nameCheck(newName);
+        
         if (newName != null) department.setDepartmentName(newName);
         if (newDescription != null) department.setDescription(newDescription);
         if (newDate != null) department.setEstablishedDate(newDate);
@@ -155,4 +150,16 @@ public class BasicDepartmentService implements DepartmentService {
 
         department.delete();
     }
+
+    private LocalDate getDateFromString(String date){
+        // "YYYY-MM-DD"(ISO-8610 표준 포맷) -> Localdate
+        if (date == null) return null;
+        try{
+            return  LocalDate.parse(date);
+        } catch (RuntimeException e){
+            throw new LocalDateFormatException("데이터 포맷이 잘 못되었습니다.","");
+        }
+
+    }
+
 }

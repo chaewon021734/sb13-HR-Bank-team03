@@ -1,6 +1,7 @@
 package com.project.hrbank.service.basic;
 
 
+import com.project.hrbank.config.DataCondition;
 import com.project.hrbank.domain.*;
 import com.project.hrbank.dto.request.EmployeeCreateRequest;
 import com.project.hrbank.dto.request.EmployeeSearchRequest;
@@ -42,6 +43,7 @@ public class BasicEmployeeService implements EmployeeService {
     private final FileMetaRepository fileMetaRepository;
     private final Structure structure;
     private final DtoMapper mapper;
+    private final DataCondition dataCondition;
 
     @Transactional(readOnly = true)
     @Override
@@ -55,7 +57,7 @@ public class BasicEmployeeService implements EmployeeService {
     }
 
     @Override
-    public EmployeeDto create(EmployeeCreateRequest request, MultipartFile file){
+    public EmployeeDto create(EmployeeCreateRequest request, MultipartFile file, String ip){
         String name = request.name();
         String email = request.email();
         // 이메일 중복 체크
@@ -83,7 +85,17 @@ public class BasicEmployeeService implements EmployeeService {
             fileMeta
         ));
 
+        dataCondition.flagSetChanged();
         // 히스토리 추가
+
+        employeeHistoryRepository.save(new EmployeeHistory(
+                emp,
+                emp.getDepartment(),
+                EmployeeHistoryType.EMPLOYEE_ADD,
+                "직원 생성",
+                memo,
+                ip
+        ));
 
         return mapper.toDto(emp);
     }
@@ -196,6 +208,8 @@ public class BasicEmployeeService implements EmployeeService {
             structure.delete(profileImage.getFileName());
             fileMetaRepository.delete(profileImage);
         }
+
+        dataCondition.flagSetChanged();
     }
 
     @Override
@@ -248,6 +262,8 @@ public class BasicEmployeeService implements EmployeeService {
             structure.delete(oldProfileImage.getFileName());
             fileMetaRepository.delete(oldProfileImage);
         }
+
+        dataCondition.flagSetChanged();
 
         return mapper.toDto(saved);
     }
