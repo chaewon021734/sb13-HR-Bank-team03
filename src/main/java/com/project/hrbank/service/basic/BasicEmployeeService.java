@@ -91,7 +91,7 @@ public class BasicEmployeeService implements EmployeeService {
         employeeHistoryRepository.save(new EmployeeHistory(
                 emp,
                 emp.getDepartment(),
-                EmployeeHistoryType.EMPLOYEE_ADD,
+                EmployeeHistoryType.CREATED,
                 "직원 생성",
                 memo,
                 ip
@@ -197,7 +197,7 @@ public class BasicEmployeeService implements EmployeeService {
         employeeHistoryRepository.save(new EmployeeHistory(
             emp,
             emp.getDepartment(),
-            EmployeeHistoryType.EMPLOYEE_DELETED,
+            EmployeeHistoryType.DELETED,
             "직원 삭제",
             null,
             remoteIp
@@ -252,7 +252,7 @@ public class BasicEmployeeService implements EmployeeService {
         employeeHistoryRepository.save(new EmployeeHistory(
                 saved,
                 saved.getDepartment(),
-                EmployeeHistoryType.EMPLOYEE_UPDATED,
+                EmployeeHistoryType.UPDATED,
                 "직원 수정",
                 request.memo(),
                 remoteIp

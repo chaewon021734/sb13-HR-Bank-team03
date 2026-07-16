@@ -2,9 +2,9 @@ package com.project.hrbank.domain;
 
 public enum EmployeeHistoryType {
 
-    EMPLOYEE_ADD("CREATED"),
-    EMPLOYEE_UPDATED("UPDATED"),
-    EMPLOYEE_DELETED("DELETED");
+    CREATED("CREATED"),
+    UPDATED("UPDATED"),
+    DELETED("DELETED");
 
 
     private final String status;
